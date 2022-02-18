@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Calendar(props) {
+function Calendar() {
   // your calendar implementation Goes here!
   // Be creative 
   return (
