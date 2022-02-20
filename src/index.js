@@ -6,17 +6,20 @@ import getStore from "./store/getStore";
 import reducers from './reducers';
 import Main from './Main';
 import reportWebVitals from "./reportWebVitals";
+import { ToastContainer } from 'react-toastify';
 
 
 // import main sass file
 import "./sass/app.scss";
+import "react-toastify/dist/ReactToastify.min.css";
 
 ReactDOM.render(
   <React.StrictMode>
     <ReduxProvider store={getStore(reducers)}>
-	    <BrowserRouter>
-	      <Main />
-	    </BrowserRouter>
+      <BrowserRouter>
+        <Main />
+      </BrowserRouter>
+      <ToastContainer />
     </ReduxProvider>
   </React.StrictMode>,
   document.getElementById("root")
