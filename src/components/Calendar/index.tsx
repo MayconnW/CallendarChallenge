@@ -21,6 +21,8 @@ export default function Calendar() {
   const [daysToShow, setDaysToShow] = useState<DayInCalendar[]>([]);
   const [reminderSelected, setReminderSelected] = useState<Reminder | undefined>(undefined);
 
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+
   useEffect(() => {
     if (!isModalOpened){
       setReminderSelected(undefined);
@@ -31,7 +33,7 @@ export default function Calendar() {
     const arr = getMonthDaysInArray(selectedMonth);
     
     setDaysToShow(arr);
-    setSelectedDate(null);
+    //setSelectedDate(null);
     setFormattedDate(format(selectedMonth, 'MMMM/yyyy'));
 
   }, [selectedMonth]);
@@ -92,21 +94,44 @@ export default function Calendar() {
     </>
   ), [daysToShow, onDateClick, selectedDate, onAddReminderClick, onReminderClick]);
 
+  
+
   const onSave = useCallback((reminder: Reminder) => {
+    setReminders((currentState) => {
+      return [
+        ...currentState.filter((i) => i.id !== reminder.id),
+        reminder
+      ].sort((itemA, itemB) =>
+        parseInt(
+          [
+            itemA.amPm === 'am' ? '1' : '2',
+            ...itemA.time.getOrCrash().split(':')
+          ].join('')
+        ) >
+        parseInt(
+          [
+            itemB.amPm === 'am' ? '1' : '2',
+            ...itemB.time.getOrCrash().split(':')
+          ].join('')
+        )
+          ? 1
+          : -1
+      );
+    });
+    setIsModalOpened(false);
+  }, []);
+
+  useEffect(() => {
     setDaysToShow(currentState => {
       return currentState.map(item => {
-        if (item.date && format(item.date, 'dd/MM') === format(reminder.date, 'dd/MM')) {
-          item.reminders = [
-            ...(item.reminders ?? []).filter(item => item.id !== reminder.id), 
-            reminder
-          ]
-          .sort((itemA,itemB) => parseInt([itemA.amPm === 'am' ? '1' : '2', ...itemA.time.getOrCrash().split(':')].join('')) > parseInt([itemB.amPm === 'am' ? '1' : '2', ...itemB.time.getOrCrash().split(':')].join('')) ? 1 : -1)
+        if (item.date) {
+          item.reminders = reminders.filter(i => format(i.date, 'dd/MM') === format(item.date ?? 0, 'dd/MM'));
         }
         return item;
       })
     })
     setIsModalOpened(false);
-  }, []);
+  }, [reminders, selectedMonth]);
   
   const onCancel = useCallback(() => {
     setIsModalOpened(false);
